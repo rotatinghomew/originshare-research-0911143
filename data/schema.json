@@ -1,0 +1,53 @@
+{
+  "classes": {
+    "key": "id",
+    "columns": {
+      "id": "text",
+      "label": "text",
+      "model_version": "text"
+    },
+    "description": "已知类仅覆盖原识别器标签，人工复核可以给出其他产地。",
+    "references": {}
+  },
+  "boxes": {
+    "key": "id",
+    "columns": {
+      "id": "text",
+      "day": "date",
+      "line": "text",
+      "species": "text",
+      "weight_kg": "number",
+      "model_version": "text",
+      "scores": "json",
+      "predicted": "text"
+    },
+    "description": "每箱一行，分数为既有识别器输出，不是人工真值。箱数和重量分别定义不同目标占比。",
+    "references": {}
+  },
+  "reviews": {
+    "key": "id",
+    "columns": {
+      "id": "text",
+      "box_id": "text",
+      "confirmed_class": "text",
+      "confirmed_at": "time"
+    },
+    "description": "确认类别允许超出已知标签集；confirmed_at 是首次可知真值的时刻，不是到货日。",
+    "references": {
+      "box_id": "boxes.id"
+    }
+  },
+  "sampling": {
+    "key": "id",
+    "columns": {
+      "id": "text",
+      "box_id": "text",
+      "selection_probability": "number",
+      "stratum": "text"
+    },
+    "description": "每箱在复核设计中的已知入选概率，不是模型置信度；未抽中的箱也有设计记录。",
+    "references": {
+      "box_id": "boxes.id"
+    }
+  }
+}
