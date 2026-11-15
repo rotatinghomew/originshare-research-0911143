@@ -4,6 +4,7 @@ from urllib.parse import parse_qs, urlsplit
 
 from .cases import CaseStore
 from .catalog import Catalog
+from .correction import DEFAULT_SEED, MAX_REPLICATES, build_report
 from .domain import overview
 from .profile import numeric_profiles
 
@@ -34,6 +35,20 @@ class Application:
                 return 200, {"source_fingerprint": self.catalog.fingerprint, "view": overview(self.catalog)}
             if method == "GET" and path == "/profiles":
                 return 200, {"source_fingerprint": self.catalog.fingerprint, "profiles": numeric_profiles(self.catalog)}
+            if method == "GET" and path == "/correction":
+                period = query.get("period", ["week"])[0]
+                as_of = query.get("as_of", [None])[0] or None
+                try:
+                    replicates = int(query.get("replicates", ["500"])[0])
+                    seed = int(query.get("seed", [str(DEFAULT_SEED)])[0])
+                except ValueError:
+                    raise ValueError("replicates 或 seed 应为整数")
+                if not 0 <= replicates <= MAX_REPLICATES:
+                    raise ValueError(f"replicates 应在 0 至 {MAX_REPLICATES} 之间")
+                if seed < 0:
+                    raise ValueError("seed 应为非负整数")
+                return 200, build_report(self.catalog, period=period, as_of=as_of,
+                                         replicates=replicates, seed=seed)
             if method == "GET" and path == "/cases":
                 return 200, {"cases": self.cases.list()}
             if method == "GET" and path.startswith("/cases/"):
